@@ -110,7 +110,7 @@ def get_dealer_details(request, dealer_id):
 # Create a `add_review` view to submit a review
 def add_review(request, dealerId):
     context = {}
-    dealer_url = "https://eu-gb.functions.appdomain.cloud/api/v1/web/darren_test_london/dealership-package/get-dealships"
+    dealer_url = "https://eu-gb.functions.appdomain.cloud/api/v1/web/darren_test_london/dealership-package/get_dealerships"
     dealer = get_dealer_by_id_from_cf(dealer_url, id=dealerId)
     context["dealer"] = dealer
     if request.method == 'GET':
