@@ -9,7 +9,7 @@ import logging
 import json
 
 from .models import CarModel
-from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, get_dealer_by_id_from_cf
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, get_dealer_by_id_from_cf, post_request
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -90,9 +90,12 @@ def get_dealerships(request):
         # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
         # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        # dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
         # Return a list of dealer short name
-        return HttpResponse(dealer_names)
+
+        context = {'dealerships': dealerships}
+
+        return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
@@ -101,10 +104,8 @@ def get_dealer_details(request, dealer_id):
         url = "https://eu-gb.functions.appdomain.cloud/api/v1/web/darren_test_london/dealership-package/get-reviews"
 
     reviews = get_dealer_reviews_from_cf(url, id=dealer_id)
-
-    review_names = ' '.join([f"{review.name} - {review.sentiment}" for review in reviews])
-    # Return a list of dealer short name
-    return HttpResponse(review_names)
+    context = {'reviews': reviews}
+    return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `add_review` view to submit a review
 def add_review(request, dealerId):
@@ -128,15 +129,15 @@ def add_review(request, dealerId):
             car = CarModel.objects.get(pk=car_id)
             payload["time"] = datetime.utcnow().isoformat()
             payload["name"] = username
-            payload["dealership"] = id
-            payload["id"] = id
+            payload["dealership"] = dealerId
+            payload["id"] = dealerId
             payload["review"] = request.POST["content"]
             payload["purchase"] = False
             if "purchasecheck" in request.POST:
                 if request.POST["purchasecheck"] == 'on':
                     payload["purchase"] = True
             payload["purchase_date"] = request.POST["purchasedate"]
-            payload["car_make"] = car.car_make.name
+            payload["car_make"] = car.make.name
             payload["car_model"] = car.name
             payload["car_year"] = int(car.year.strftime("%Y"))
 
@@ -144,5 +145,5 @@ def add_review(request, dealerId):
             json_payload["review"] = payload
             review_post_url = "https://eu-gb.functions.appdomain.cloud/api/v1/web/darren_test_london/dealership-package/post-reivew"
             post_request(review_post_url, json_payload, dealerId=dealerId)
-        return redirect("djangoapp:dealer_details", dealerId=dealerId)
+        return redirect("djangoapp:dealer_details", dealer_id=dealerId)
 
