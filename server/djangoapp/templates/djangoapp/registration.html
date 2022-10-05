@@ -12,9 +12,9 @@
         <form class="form-inline" action="{% url 'djangoapp:registration' %}" method="post">
             {% csrf_token %}
             <div class="input-group">
-                User Name<input type="text" class="form-control" placeholder="Username" name="Enter User Name:" >
-                First Name<input type="text" class="form-control" placeholder="Firstname" name="Enter First Name:" >
-                Last Name<input type="text" class="form-control" placeholder="Lastname" name="Enter Last Name:" >
+                User Name<input type="text" class="form-control" name="username" placeholder="Enter User Name:" >
+                First Name<input type="text" class="form-control" name="firstname" placeholder="Enter First Name:" >
+                Last Name<input type="text" class="form-control" name="lastname" placeholder="Enter Last Name:" >
                 Password<input type="password" class="form-control" placeholder="Password" name="psw" >
                 <button class="btn btn-primary" type="submit">Sign up</button>
                 <ul>
